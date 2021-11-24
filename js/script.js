@@ -36,6 +36,8 @@ function showMyInfo() {
   });
 }
 
+function setEditMyInfo(on) {}
+
 function init() {
   showMyInfo();
 }
