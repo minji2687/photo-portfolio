@@ -59,10 +59,13 @@ function updateMyInfo() {
   setEditMyInfo(false);
 }
 function showPhotos() {
+  let existingNodes = document.querySelectorAll("article:not(.hidden)");
+  existingNodes.forEach(function (existingNode) {
+    existingNode.remove();
+  });
   let gallery = document.querySelector("#gallery");
 
   photos.forEach(function (photo) {
-    console.log(photo);
     let photoNode = document.querySelector("article.hidden").cloneNode(true);
     photoNode.classList.remove("hidden");
 
@@ -76,9 +79,36 @@ function showPhotos() {
     photoNode.querySelector(
       ".photo"
     ).style.backgroundImage = `url('./img/photo/${photo.file_name}')`;
+    photoNode.querySelector(".like").addEventListener("click", function () {
+      toggleLike(photo.idx);
+    });
 
     gallery.append(photoNode);
   });
+}
+
+function toggleLike(idx) {
+  if (my_info.like.indexOf(idx) === -1) {
+    //좋아요 하려고 누른것
+    my_info.like.push(idx);
+    for (var i = 0; i < photos.length; i++) {
+      if (photos[i].idx === idx) {
+        photos[i].likes++;
+        break;
+      }
+    }
+  } else {
+    my_info.like = my_info.like.filter(function (it) {
+      return it !== idx;
+    });
+    for (var i = 0; i < photos.length; i++) {
+      if (photos[i].idx === idx) {
+        photos[i].likes--;
+        break;
+      }
+    }
+  }
+  showPhotos();
 }
 function init() {
   showMyInfo();
