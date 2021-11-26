@@ -53,12 +53,34 @@ function updateMyInfo() {
   document
     .querySelectorAll("#myinfo input[type=checkbox]:checked")
     .forEach(function (checked) {
-      console.log(checked.value);
       interests.push(checked.value);
     });
   my_info.interest = interests;
   setEditMyInfo(false);
 }
+function showPhotos() {
+  let gallery = document.querySelector("#gallery");
+
+  photos.forEach(function (photo) {
+    console.log(photo);
+    let photoNode = document.querySelector("article.hidden").cloneNode(true);
+    photoNode.classList.remove("hidden");
+
+    photoNode.querySelector(".author").innerText = photo.user_name;
+    photoNode.querySelector(".desc").innerText = photo.description;
+    photoNode.querySelector(".like").innerText = photo.likes;
+    if (my_info.like.indexOf(photo.idx) > -1) {
+      photoNode.querySelector(".like").classList.add("on");
+    }
+
+    photoNode.querySelector(
+      ".photo"
+    ).style.backgroundImage = `url('./img/photo/${photo.file_name}')`;
+
+    gallery.append(photoNode);
+  });
+}
 function init() {
   showMyInfo();
+  showPhotos();
 }
