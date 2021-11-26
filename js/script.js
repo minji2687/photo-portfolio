@@ -1,3 +1,5 @@
+// Required for side-effects
+
 function setMenu(_menu) {
   let menus = document.querySelectorAll("nav li");
   console.log(menus);
@@ -57,6 +59,7 @@ function updateMyInfo() {
     });
   my_info.interest = interests;
   setEditMyInfo(false);
+  updateMyInfoOnDB();
 }
 function showPhotos() {
   let existingNodes = document.querySelectorAll("article:not(.hidden)");
@@ -111,6 +114,35 @@ function toggleLike(idx) {
   showPhotos();
 }
 function init() {
-  showMyInfo();
-  showPhotos();
+  //   showMyInfo();
+  //   showPhotos();
+  loadMyInfo();
+}
+
+function loadMyInfo() {
+  db.collection("my_info")
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        my_info = doc.data();
+        console.log(doc.id);
+        my_info.docId = doc.id;
+
+        showMyInfo();
+        // console.log(`${d oc.id} => ${doc.data()}`);
+      });
+    });
+}
+
+function updateMyInfoOnDB() {
+  db.collection("my_info")
+    .doc(my_info.docId)
+    .update({
+      introduction: my_info.introduction,
+      as: my_info.as,
+      interest: my_info.interest,
+    })
+    .then(function () {
+      loadMyInfo();
+    });
 }
