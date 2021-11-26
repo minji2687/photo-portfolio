@@ -36,8 +36,29 @@ function showMyInfo() {
   });
 }
 
-function setEditMyInfo(on) {}
+function setEditMyInfo(on) {
+  document.querySelector("#myinfo > div").classList = on ? "edit" : "non-edit";
+  document.querySelectorAll("#myinfo input").forEach(function (input) {
+    input.disabled = !on;
+  });
+  showMyInfo();
+}
 
+function updateMyInfo() {
+  my_info.introduction = document.querySelector("#ip-intro").value;
+  my_info.as = document.querySelector(
+    "#myinfo input[type=radio]:checked"
+  ).value;
+  let interests = [];
+  document
+    .querySelectorAll("#myinfo input[type=checkbox]:checked")
+    .forEach(function (checked) {
+      console.log(checked.value);
+      interests.push(checked.value);
+    });
+  my_info.interest = interests;
+  setEditMyInfo(false);
+}
 function init() {
   showMyInfo();
 }
