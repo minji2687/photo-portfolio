@@ -1,5 +1,3 @@
-// Required for side-effects
-
 function setMenu(_menu) {
   let menus = document.querySelectorAll("nav li");
   console.log(menus);
@@ -145,4 +143,16 @@ function updateMyInfoOnDB() {
     .then(function () {
       loadMyInfo();
     });
+}
+
+function uploadFile() {
+  let file = document.querySelector("input[type=file]").files[0];
+
+  //올릴 파일의 단위
+  var ref = storage.ref().child(file.name);
+  ref.put(file).then(function (snapshot) {
+    snapshot.ref.getDownloadURL().then(function (url) {
+      console.log(url);
+    });
+  });
 }
