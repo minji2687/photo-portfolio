@@ -59,6 +59,7 @@ function updateMyInfo() {
   setEditMyInfo(false);
   updateMyInfoOnDB();
 }
+
 function showPhotos() {
   let existingNodes = document.querySelectorAll("article:not(.hidden)");
   existingNodes.forEach(function (existingNode) {
@@ -73,19 +74,50 @@ function showPhotos() {
     photoNode.querySelector(".author").innerText = photo.user_name;
     photoNode.querySelector(".desc").innerText = photo.description;
     photoNode.querySelector(".like").innerText = photo.likes;
+
     if (my_info.like.indexOf(photo.idx) > -1) {
       photoNode.querySelector(".like").classList.add("on");
     }
 
+    if (my_info.follow.indexOf(photo.user_id) > -1) {
+      var followSpan = document.createElement("span");
+      followSpan.innerHTML = "FOLLOW";
+      photoNode.querySelector(".author").append(followSpan);
+    }
+
+    photoNode.querySelector(".author").addEventListener("click", function () {
+      toggleFollow(photo.user_id);
+    });
+
     photoNode.querySelector(
       ".photo"
-    ).style.backgroundImage = `url('./img/photo/${photo.file_name}')`;
+    ).style.backgroundImage = `url('${photo.url}')`;
     photoNode.querySelector(".like").addEventListener("click", function () {
       toggleLike(photo.idx);
     });
 
     gallery.append(photoNode);
   });
+}
+
+function toggleFollow(user_id) {
+  console.log("follow");
+  if (my_info.follow.indexOf(user_id) === -1) {
+    my_info.follow.push(user_id);
+  } else {
+    my_info.follow = my_info.follow.filter(function (it) {
+      return it !== user_id;
+    });
+  }
+
+  db.collection("my_info")
+    .doc(my_info.docId)
+    .update({
+      follow: my_info.follow,
+    })
+    .then(function () {
+      loadPhotos();
+    });
 }
 
 function toggleLike(idx) {
@@ -95,6 +127,7 @@ function toggleLike(idx) {
     for (var i = 0; i < photos.length; i++) {
       if (photos[i].idx === idx) {
         photos[i].likes++;
+        toggleLikeOnDB(photos[i]);
         break;
       }
     }
@@ -105,16 +138,34 @@ function toggleLike(idx) {
     for (var i = 0; i < photos.length; i++) {
       if (photos[i].idx === idx) {
         photos[i].likes--;
+        toggleLikeOnDB(photosc[i]);
         break;
       }
     }
   }
-  showPhotos();
 }
+
+function toggleLikeOnDB(photo) {
+  db.collection("my_info")
+    .doc(my_info.docId)
+    .update({
+      like: my_info.like,
+    })
+    .then(function () {
+      db.collection("photos")
+        .doc(String(photo.idx))
+        .update({
+          likes: photo.likes,
+        })
+        .then(function () {
+          loadPhotos();
+        });
+    });
+}
+
 function init() {
-  //   showMyInfo();
-  //   showPhotos();
   loadMyInfo();
+  loadPhotos();
 }
 
 function loadMyInfo() {
@@ -153,6 +204,42 @@ function uploadFile() {
   ref.put(file).then(function (snapshot) {
     snapshot.ref.getDownloadURL().then(function (url) {
       console.log(url);
+      uploadPhotoInfo(url);
     });
   });
+}
+
+function uploadPhotoInfo(url) {
+  let photoInfo = {
+    idx: Date.now(),
+    url: url,
+    user_id: my_info.id,
+    user_name: my_info.user_name,
+    description: document.querySelector("input.description").value,
+    likes: Math.round(Math.random() * 10),
+  };
+  db.collection("photos")
+    .doc(String(photoInfo.idx))
+    .set(photoInfo)
+    .then(function () {
+      console.log("Success!");
+      setMenu("gallery");
+      loadPhotos();
+    })
+    .catch(function (error) {
+      console.error("Error!", error);
+    });
+}
+
+function loadPhotos() {
+  db.collection("photos")
+    .get()
+    .then(function (querySnapshot) {
+      let photosArray = [];
+      querySnapshot.forEach(function (doc) {
+        photosArray.push(doc.data());
+      });
+      photos = photosArray;
+      showPhotos();
+    });
 }

@@ -10,7 +10,9 @@ let _my_info = {
   follow: ["photo-luv", "pixa", "googler", "js-master"],
 };
 
-let photos = [
+let photos = [];
+
+let _photos = [
   {
     idx: 1,
     user_id: "js-master",
