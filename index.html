@@ -38,6 +38,7 @@
         <li class="like">좋아요 한 사진</li>
         <li class="follow">팔로우 회원 사진</li>
       </ul>
+      <div id="backToGallery" class="dep _detail option-title" onclick="setMenu('gallery')">◀︎ 뒤로가기</div>
     </aside>
     <div class="content">
 
@@ -119,6 +120,19 @@
           <div class="mi-dep edit button cancel" onclick="setEditMyInfo(false)">취소</div>
         </div>
       </section>
+
+      <section id="detail" class="dep _detail">
+        <div class="photo"></div>
+        <div class="author"></div>
+        <div class="desc"></div>
+
+        <br>
+        <input id="comment-input" type="text" placeholder="댓글을 작성해주세요.">
+        <div id="comment-submit-button" onclick="uploadComment();">올리기</div>
+        <div id="comments"></div>
+      </section>
+
+
 
     </div>
     <a class="write" onclick="setMenu('upload')">

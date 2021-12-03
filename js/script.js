@@ -96,7 +96,19 @@ function showPhotos() {
       toggleLike(photo.idx);
     });
 
-    gallery.append(photoNode);
+    photoNode.addEventListener("click", function () {
+      selectedPhoto = photo;
+      document.querySelector("main").className = "detail";
+
+      var detailSection = document.querySelector("#detail");
+      detailSection.querySelector(".photo").style.backgroundImage =
+        "url('" + photo.url + "')";
+      detailSection.querySelector(".author").innerHTML = photo.user_name;
+      detailSection.querySelector(".desc").innerHTML = photo.description;
+      loadComments();
+    });
+
+    gallery.appendChild(photoNode);
   });
 }
 
@@ -233,13 +245,97 @@ function uploadPhotoInfo(url) {
 
 function loadPhotos() {
   db.collection("photos")
+    .where(
+      getFilterParams[filterName]()[0],
+      getFilterParams[filterName]()[1],
+      getFilterParams[filterName]()[2]
+    )
     .get()
     .then(function (querySnapshot) {
       let photosArray = [];
       querySnapshot.forEach(function (doc) {
         photosArray.push(doc.data());
+        console.log(doc.data().idx);
       });
       photos = photosArray;
       showPhotos();
+    });
+}
+
+var filterName = "all";
+
+var getFilterParams = {
+  all: function () {
+    return ["idx", ">", 0];
+  },
+  mine: function () {
+    return ["user_id", "==", my_info.id];
+  },
+  like: function () {
+    return ["idx", "in", my_info.like];
+  },
+  follow: function () {
+    return ["user_id", "in", my_info.follow];
+  },
+};
+var selectedPhoto;
+
+function uploadComment() {
+  var comment = {
+    idx: Date.now(),
+    photo_idx: selectedPhoto.idx,
+    user_id: my_info.id,
+    user_name: my_info.user_name,
+    comment: document.querySelector("#comment-input").value,
+  };
+
+  db.collection("comments")
+    .doc(String(comment.idx))
+    .set(comment)
+    .then(function () {
+      console.log("Success!");
+      document.querySelector("#comment-input").value = "";
+      loadComments();
+    })
+    .catch(function (error) {
+      console.error("Error!", error);
+    });
+}
+
+function loadComments() {
+  document.querySelector("#comments").innerHTML = "";
+  db.collection("comments")
+    .where("photo_idx", "==", selectedPhoto.idx)
+    .get()
+    .then(function (querySnapshot) {
+      var comments = [];
+      querySnapshot.forEach(function (doc) {
+        comments.push(doc.data());
+      });
+      comments.sort(function (a, b) {
+        return a.idx > b.idx ? -1 : 1;
+      });
+      console.log(comments);
+
+      comments.forEach(function (comment) {
+        var commentArticle = document.createElement("article");
+        var commentInfoDiv = document.createElement("div");
+
+        commentInfoDiv.className = "comment-info";
+        commentInfoDiv.innerHTML = comment.user_name;
+
+        var dateSpan = document.createElement("span");
+        dateSpan.innerHTML = new Date(comment.idx);
+
+        commentInfoDiv.appendChild(dateSpan);
+
+        var commentContentDiv = document.createElement("div");
+        commentContentDiv.innerHTML = comment.comment;
+
+        commentArticle.append(commentInfoDiv);
+        commentArticle.append(commentContentDiv);
+
+        document.querySelector("#comments").append(commentArticle);
+      });
     });
 }

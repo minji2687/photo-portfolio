@@ -262,8 +262,56 @@ main .dep {
 main.gallery .dep._intro,
 main.gallery .dep._gallery,
 main.upload .dep._upload,
-main.myinfo .dep._myinfo {
+main.myinfo .dep._myinfo,
+main.detail .dep._detail {
   display: block;
+}
+
+#backToGallery {
+  cursor: pointer;
+}
+#backToGallery:hover {
+  opacity: 0.8;
+}
+
+#detail {
+  padding: 32px;
+}
+#detail .photo {
+  width: 660px;
+  height: 480px;
+  background-size: cover;
+  background-position: 50% 50%;
+}
+#detail .author {
+  margin-top: 24px;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+#detail .desc {
+  font-size: 1.1rem;
+  margin-top: 8px;
+}
+
+#comment-input {
+  font-size: 1rem;
+  width: 560px;
+  height: 32px;
+  padding: 0 8px;
+  line-height: 32px;
+}
+#comment-submit-button {
+  display: inline-block;
+  height: 36px;
+  line-height: 36px;
+  padding: 0 16px;
+  color: white;
+  background-color: #ff4500;
+  vertical-align: top;
+  cursor: pointer;
+}
+#comment-submit-button:hover {
+  opacity: 0.8;
 }
 
 main .write {
@@ -309,4 +357,25 @@ footer ul > li a {
 }
 footer ul > li a:hover {
   opacity: 0.67;
+}
+
+#comments {
+  margin-top: 18px;
+  width: 660px;
+}
+#comments > article {
+  padding: 16px 12px;
+}
+#comments > article:not(:last-child) {
+  border-bottom: 1px solid #ddd;
+}
+#comments > article .comment-info {
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+#comments > article .comment-info span {
+  margin-left: 8px;
+  font-weight: normal;
+  font-size: 0.9rem;
+  color: gray;
 }
